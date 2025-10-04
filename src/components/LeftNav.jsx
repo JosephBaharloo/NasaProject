@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CloudHail, LayoutDashboard, CalendarDays, Settings, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -8,6 +8,29 @@ const LeftNav = ({ activeView, setActiveView }) => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const modalRef = useRef(null);
+    const avatarRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (
+                modalRef.current &&
+                !modalRef.current.contains(event.target) &&
+                avatarRef.current &&
+                !avatarRef.current.contains(event.target)
+            ) {
+                setIsModalOpen(false);
+            }
+        };
+
+        if (isModalOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isModalOpen]);
 
     const getInitials = (name) => {
         if (!name) return '??';
@@ -37,13 +60,14 @@ const LeftNav = ({ activeView, setActiveView }) => {
             </div>
             <div className="relative">
                 <div
+                    ref={avatarRef}
                     className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center font-bold text-lg cursor-pointer"
                     onClick={() => setIsModalOpen(!isModalOpen)}
                 >
                     {user ? getInitials(user.username) : '??'}
                 </div>
                 {isModalOpen && user && ReactDOM.createPortal(
-                    <div className="absolute bottom-14 left-24 w-56 glass-panel-light rounded-lg p-4 shadow-lg z-50">
+                    <div ref={modalRef} className="absolute bottom-14 left-24 w-56 glass-panel-light rounded-lg p-4 shadow-lg z-50">
                         <div className="text-center mb-4">
                             <p className="font-bold text-white">{user.username}</p>
                             <p className="text-sm text-gray-300">{user.email}</p>
