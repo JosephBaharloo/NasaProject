@@ -13,10 +13,10 @@ const LandingPage = () => {
                     Your personal AI weather assistant. Get hyper-local forecasts, smart activity suggestions, and stay ahead of the weather.
                 </p>
                 <div className="flex gap-4">
-                    <Link to="/dashboard" className="glass-panel-light px-8 py-4 rounded-full flex items-center gap-2 font-bold text-lg hover:bg-white/20 transition-colors">
+                    <Link to="/signup" className="glass-panel-light px-8 py-4 rounded-full flex items-center gap-2 font-bold text-lg hover:bg-white/20 transition-colors">
                         Get Started <ArrowRight className="w-5 h-5" />
                     </Link>
-                    <Link to="/dashboard" className="bg-transparent border border-white/50 px-8 py-4 rounded-full font-bold text-lg hover:bg-white/10 transition-colors">
+                    <Link to="/login" className="bg-transparent border border-white/50 px-8 py-4 rounded-full font-bold text-lg hover:bg-white/10 transition-colors">
                         Login
                     </Link>
                 </div>
