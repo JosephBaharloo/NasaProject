@@ -22,10 +22,17 @@
     font-size: 1.2rem;
 }
 
-.react-calendar__navigation button:hover {
-    background-color: rgba(255, 255, 255, 0.3);
-    border-radius: 8px;
+.react-calendar__navigation button,
+.react-calendar__navigation button:hover,
+.react-calendar__navigation button:focus,
+.react-calendar__navigation button:active {
+  background-color: transparent !important;
+  color: inherit !important;
+  box-shadow: none !important;
+  outline: none !important;
+  cursor: pointer; /* Optional */
 }
+
 
 .react-calendar__navigation__label {
     font-weight: bold;

@@ -1,13 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { CloudHail } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
+  const [identifier, setIdentifier] = useState('');
+  const [password, setPassword] = useState('');
 
   const handleLogin = (e) => {
     e.preventDefault();
-    // Add login logic here
+    const isEmail = identifier.includes('@');
+    const mockUser = {
+      username: isEmail ? 'testuser' : identifier,
+      email: isEmail ? identifier : `${identifier}@example.com`,
+    };
+    login(mockUser);
     navigate('/dashboard');
   };
 
@@ -23,14 +32,16 @@ const LoginPage = () => {
         <div className="glass-panel p-8 rounded-2xl w-full max-w-md">
           <form onSubmit={handleLogin}>
             <div className="mb-4 text-left">
-              <label className="block text-gray-300 mb-2" htmlFor="email">
-                Email
+              <label className="block text-gray-300 mb-2" htmlFor="identifier">
+                Username or Email
               </label>
               <input
                 className="w-full p-3 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:border-white/50 transition-colors"
-                type="email"
-                id="email"
-                placeholder="you@example.com"
+                type="text"
+                id="identifier"
+                placeholder="yourusername or you@example.com"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
                 required
               />
             </div>
@@ -43,6 +54,8 @@ const LoginPage = () => {
                 type="password"
                 id="password"
                 placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </div>

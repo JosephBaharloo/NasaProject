@@ -22,10 +22,10 @@ const EventsView = () => {
         const forecastString = Object.entries(weatherData['central-jakarta'].daily)
             .map(([day, data]) => `${day}: ${data.title} (${data.temp}°C)`)
             .join(', ');
-        
+
         const systemInstruction = "You are Aura, a friendly and helpful AI weather assistant. Your personality is a bit witty and empathetic. Your goal is to give creative and practical activity ideas based on the weather.";
         const prompt = `Here is the upcoming weekly weather forecast: ${forecastString}. Based on this, suggest 3 fun and diverse activity ideas for the user. Present them as a list.`;
-        
+
         const response = await callGeminiAPI(prompt, systemInstruction);
         setIdeas(response.split('\n').filter(idea => idea.length > 0));
         setIsLoading(false);
@@ -33,7 +33,7 @@ const EventsView = () => {
 
     const tileContent = ({ date, view }) => {
         if (view === 'month') {
-            const event = events.find(event => 
+            const event = events.find(event =>
                 event.date.getDate() === date.getDate() &&
                 event.date.getMonth() === date.getMonth() &&
                 event.date.getFullYear() === date.getFullYear()
@@ -63,7 +63,7 @@ const EventsView = () => {
 
             {ideas.length > 0 && (
                 <div className="mb-6 glass-panel-light rounded-2xl p-4">
-                     <h3 className="font-bold mb-2">Aura's Suggestions ✨</h3>
+                    <h3 className="font-bold mb-2">Aura's Suggestions ✨</h3>
                     <ul className="list-disc list-inside space-y-2 text-gray-200">
                         {ideas.map((idea, index) => <li key={index}>{idea.replace(/^\* ?/g, '')}</li>)}
                     </ul>
@@ -75,7 +75,7 @@ const EventsView = () => {
                     onChange={setDate}
                     value={date}
                     tileContent={tileContent}
-                    className="glass-panel-light rounded-2xl p-4"
+                    className="glass-panel-light rounded-2xl p-4 w-full h-full "
                 />
             </div>
             <button className="mt-6 w-full glass-panel-light p-4 rounded-2xl font-bold hover:bg-white/20 transition-colors">Create New Event</button>

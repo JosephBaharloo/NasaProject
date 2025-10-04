@@ -5,30 +5,33 @@ import App from './App.jsx';
 import LandingPage from './views/LandingPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import SignupPage from './pages/SignupPage.jsx';
+import { AuthProvider } from './context/AuthContext.jsx';
 import './index.css';
 
 const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <LandingPage />,
-  },
-  {
-    path: '/dashboard',
-    element: <App />,
-  },
-  {
-    path: '/login',
-    element: <LoginPage />,
-  },
-  {
-    path: '/signup',
-    element: <SignupPage />,
-  },
+	{
+		path: '/',
+		element: <LandingPage />,
+	},
+	{
+		path: '/dashboard',
+		element: <App />,
+	},
+	{
+		path: '/login',
+		element: <LoginPage />,
+	},
+	{
+		path: '/signup',
+		element: <SignupPage />,
+	},
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <RouterProvider router={router} />
-  </React.StrictMode>,
+	<React.StrictMode>
+		<AuthProvider>
+			<RouterProvider router={router} />
+		</AuthProvider>
+	</React.StrictMode>,
 );
 
