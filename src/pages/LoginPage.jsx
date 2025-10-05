@@ -6,17 +6,16 @@ import { useAuth } from '../context/AuthContext';
 const LoginPage = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
-  const [identifier, setIdentifier] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = (e) => {
     e.preventDefault();
-    const isEmail = identifier.includes('@');
-    // Email ile giriş yapıldıysa username olarak email'in @ öncesi kısmını al
-    // Username ile giriş yapıldıysa email olarak kullanıcının girdiği değeri kullan
+    // Mock user for testing - In production, this would come from backend
     const mockUser = {
-      username: isEmail ? identifier.split('@')[0] : identifier,
-      email: isEmail ? identifier : identifier,  // Her iki durumda da girilen değeri kullan
+      name: 'John',
+      surname: 'Doe',
+      email: email,
     };
     login(mockUser);
     navigate('/dashboard');
@@ -34,16 +33,16 @@ const LoginPage = () => {
         <div className="glass-panel p-8 rounded-2xl w-full max-w-md">
           <form onSubmit={handleLogin}>
             <div className="mb-4 text-left">
-              <label className="block text-gray-300 mb-2" htmlFor="identifier">
-                Username or Email
+              <label className="block text-gray-300 mb-2" htmlFor="email">
+                Email
               </label>
               <input
                 className="w-full p-3 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:border-white/50 transition-colors"
-                type="text"
-                id="identifier"
-                placeholder="yourusername or you@example.com"
-                value={identifier}
-                onChange={(e) => setIdentifier(e.target.value)}
+                type="email"
+                id="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>

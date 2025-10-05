@@ -6,7 +6,8 @@ import { useAuth } from '../context/AuthContext';
 const SignupPage = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
-  const [username, setUsername] = useState('');
+  const [name, setName] = useState('');
+  const [surname, setSurname] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -14,7 +15,8 @@ const SignupPage = () => {
     e.preventDefault();
     // Signup işlemi sonrası kullanıcıyı login et
     const newUser = {
-      username: username,
+      name: name,
+      surname: surname,
       email: email,
     };
     login(newUser);
@@ -33,16 +35,30 @@ const SignupPage = () => {
         <div className="glass-panel p-8 rounded-2xl w-full max-w-md">
           <form onSubmit={handleSignup}>
             <div className="mb-4 text-left">
-              <label className="block text-gray-300 mb-2" htmlFor="username">
-                Username
+              <label className="block text-gray-300 mb-2" htmlFor="name">
+                First Name
               </label>
               <input
                 className="w-full p-3 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:border-white/50 transition-colors"
                 type="text"
-                id="username"
-                placeholder="yourusername"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                id="name"
+                placeholder="John"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </div>
+            <div className="mb-4 text-left">
+              <label className="block text-gray-300 mb-2" htmlFor="surname">
+                Last Name
+              </label>
+              <input
+                className="w-full p-3 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:border-white/50 transition-colors"
+                type="text"
+                id="surname"
+                placeholder="Doe"
+                value={surname}
+                onChange={(e) => setSurname(e.target.value)}
                 required
               />
             </div>

@@ -45,15 +45,6 @@ const LeftNav = () => {
         setIsModalOpen(!isModalOpen);
     };
 
-    const getInitials = (name) => {
-        if (!name) return '??';
-        const names = name.split(' ');
-        if (names.length > 1 && names[1]) {
-            return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
-        }
-        return name.substring(0, 2).toUpperCase();
-    };
-
     const handleLogout = () => {
         logout();
         navigate('/');
@@ -99,7 +90,7 @@ const LeftNav = () => {
                     className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center font-bold text-lg cursor-pointer hover:bg-white/20 transition-colors"
                     onClick={handleAvatarClick}
                 >
-                    {user ? getInitials(user.username) : '??'}
+                    {user ? user.getInitials() : '??'}
                 </div>
                 {isModalOpen && user && ReactDOM.createPortal(
                     <div 
@@ -111,7 +102,7 @@ const LeftNav = () => {
                         }}
                     >
                         <div className="text-center mb-4">
-                            <p className="font-bold text-white">{user.username}</p>
+                            <p className="font-bold text-white">{user.getFullName()}</p>
                             <p className="text-sm text-gray-300">{user.email}</p>
                         </div>
                         <button
