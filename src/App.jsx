@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
+import { Outlet } from 'react-router-dom';
 import { weatherData } from './data/weatherData.jsx';
 import LeftNav from './components/LeftNav';
 import RightSidebar from './components/RightSidebar';
-import DashboardView from './views/DashboardView';
-import EventsView from './views/EventsView';
-import SettingsView from './views/SettingsView';
 import AuraModal from './components/AuraModal';
 
 export default function App() {
-    const [activeView, setActiveView] = useState('dashboard');
     const [selectedDay, setSelectedDay] = useState('wednesday');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const location = weatherData['central-jakarta'];
@@ -22,11 +19,9 @@ export default function App() {
     return (
         <>
             <div className="text-white h-screen w-screen p-4 flex gap-4">
-                <LeftNav activeView={activeView} setActiveView={setActiveView} />
+                <LeftNav />
                 <main className="flex-1 glass-panel rounded-3xl p-6 md:p-8 flex flex-col overflow-y-auto">
-                    {activeView === 'dashboard' && <DashboardView location={location} selectedDay={selectedDay} setSelectedDay={setSelectedDay} onAskAura={handleAskAura} />}
-                    {activeView === 'events' && <EventsView />}
-                    {activeView === 'settings' && <SettingsView />}
+                    <Outlet context={{ location, selectedDay, setSelectedDay, onAskAura: handleAskAura }} />
                 </main>
                 <RightSidebar location={location} />
             </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const SettingsView = () => (
+const SettingsPage = () => (
     <div className="h-full">
         <h1 className="text-3xl font-bold mb-6">Settings</h1>
         <div className="space-y-6">
@@ -24,4 +24,4 @@ const SettingsView = () => (
     </div>
 );
 
-export default SettingsView;
+export default SettingsPage;

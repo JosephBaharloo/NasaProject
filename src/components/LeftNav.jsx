@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, NavLink } from 'react-router-dom';
 import { CloudHail, LayoutDashboard, CalendarDays, Settings, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import ReactDOM from 'react-dom';
+import logoImage from '../assets/icons/nasaSpaceChallenge.png';
 
-const LeftNav = ({ activeView, setActiveView }) => {
+const LeftNav = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalPosition, setModalPosition] = useState({ top: 0,left: 0 });
     const modalRef = useRef(null);
     const avatarRef = useRef(null);
 
@@ -32,6 +34,17 @@ const LeftNav = ({ activeView, setActiveView }) => {
         };
     }, [isModalOpen]);
 
+    const handleAvatarClick = () => {
+        if (avatarRef.current) {
+            const rect = avatarRef.current.getBoundingClientRect();
+            setModalPosition({
+                top: rect.top - 60, // Daha yukarıda
+                left: rect.right + 12 // Avatar'ın sağında, 12px boşluk
+            });
+        }
+        setIsModalOpen(!isModalOpen);
+    };
+
     const getInitials = (name) => {
         if (!name) return '??';
         const names = name.split(' ');
@@ -50,24 +63,53 @@ const LeftNav = ({ activeView, setActiveView }) => {
         <nav className="glass-panel rounded-3xl flex flex-col items-center justify-between py-6 px-2 w-20">
             <div className="flex flex-col items-center gap-6">
                 <div className="w-10 h-10 flex items-center justify-center">
-                    <img src="src\assets\icons\nasaSpaceChallenge.png" alt="Logo" className="w-8 h-8" />
+                    <img src={logoImage} alt="Logo" className="w-8 h-8" />
                 </div>
                 <ul className="flex flex-col gap-4">
-                    <li><button className={`nav-item p-3 rounded-xl ${activeView === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveView('dashboard')}><LayoutDashboard /></button></li>
-                    <li><button className={`nav-item p-3 rounded-xl ${activeView === 'events' ? 'active' : ''}`} onClick={() => setActiveView('events')}><CalendarDays /></button></li>
-                    <li><button className={`nav-item p-3 rounded-xl ${activeView === 'settings' ? 'active' : ''}`} onClick={() => setActiveView('settings')}><Settings /></button></li>
+                    <li>
+                        <NavLink 
+                            to="/dashboard" 
+                            end
+                            className={({ isActive }) => `nav-item p-3 rounded-xl block ${isActive ? 'active' : ''}`}
+                        >
+                            <LayoutDashboard />
+                        </NavLink>
+                    </li>
+                    <li>
+                        <NavLink 
+                            to="/dashboard/events"
+                            className={({ isActive }) => `nav-item p-3 rounded-xl block ${isActive ? 'active' : ''}`}
+                        >
+                            <CalendarDays />
+                        </NavLink>
+                    </li>
+                    <li>
+                        <NavLink 
+                            to="/dashboard/settings"
+                            className={({ isActive }) => `nav-item p-3 rounded-xl block ${isActive ? 'active' : ''}`}
+                        >
+                            <Settings />
+                        </NavLink>
+                    </li>
                 </ul>
             </div>
             <div className="relative">
                 <div
                     ref={avatarRef}
-                    className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center font-bold text-lg cursor-pointer"
-                    onClick={() => setIsModalOpen(!isModalOpen)}
+                    className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center font-bold text-lg cursor-pointer hover:bg-white/20 transition-colors"
+                    onClick={handleAvatarClick}
                 >
                     {user ? getInitials(user.username) : '??'}
                 </div>
                 {isModalOpen && user && ReactDOM.createPortal(
-                    <div ref={modalRef} className="absolute bottom-14 left-24 w-56 glass-panel-light rounded-lg p-4 shadow-lg z-50">
+                    <div 
+                        ref={modalRef} 
+                        className="fixed w-56 glass-panel-light rounded-lg p-4 shadow-lg z-50 border border-white/20"
+                        style={{ 
+                            top: `${modalPosition.top}px`, 
+                            left: `${modalPosition.left}px` 
+                        }}
+                    >
                         <div className="text-center mb-4">
                             <p className="font-bold text-white">{user.username}</p>
                             <p className="text-sm text-gray-300">{user.email}</p>

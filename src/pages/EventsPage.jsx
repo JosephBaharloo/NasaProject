@@ -2,20 +2,21 @@ import React, { useState } from 'react';
 import { Sparkles, LoaderCircle } from 'lucide-react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
-import '../react-calendar.css'; // Özel stiller
+import '../react-calendar.css';
 import { callGeminiAPI } from '../services/geminiApi';
 import { weatherData } from '../data/weatherData.jsx';
+import CreateEventModal from '../components/CreateEventModal';
 
-const events = [
-    { date: new Date(2025, 9, 11), title: 'Hiking Trip' },
-    { date: new Date(2025, 9, 26), title: "Anna's Wedding" },
-    { date: new Date(2025, 10, 7), title: 'Camping' },
-];
-
-const EventsView = () => {
+const EventsPage = () => {
     const [ideas, setIdeas] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [date, setDate] = useState(new Date(2025, 9, 4));
+    const [events, setEvents] = useState([
+        { date: new Date(2025, 9, 11), title: 'Hiking Trip' },
+        { date: new Date(2025, 9, 26), title: "Anna's Wedding" },
+        { date: new Date(2025, 10, 7), title: 'Camping' },
+    ]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const handleGetIdeas = async () => {
         setIsLoading(true);
@@ -29,6 +30,11 @@ const EventsView = () => {
         const response = await callGeminiAPI(prompt, systemInstruction);
         setIdeas(response.split('\n').filter(idea => idea.length > 0));
         setIsLoading(false);
+    };
+
+    const handleCreateEvent = (newEvent) => {
+        setEvents([...events, newEvent]);
+        console.log('New event created:', newEvent);
     };
 
     const tileContent = ({ date, view }) => {
@@ -78,9 +84,20 @@ const EventsView = () => {
                     className="glass-panel-light rounded-2xl p-4 w-full h-full "
                 />
             </div>
-            <button className="mt-6 w-full glass-panel-light p-4 rounded-2xl font-bold hover:bg-white/20 transition-colors">Create New Event</button>
+            <button 
+                onClick={() => setIsModalOpen(true)}
+                className="mt-6 w-full glass-panel-light p-4 rounded-2xl font-bold hover:bg-white/20 transition-colors"
+            >
+                Create New Event
+            </button>
+            
+            <CreateEventModal 
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onCreateEvent={handleCreateEvent}
+            />
         </div>
     );
 };
 
-export default EventsView;
+export default EventsPage;
