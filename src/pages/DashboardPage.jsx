@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Search, Bell, Sparkles, Calendar } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useOutletContext } from 'react-router-dom';
 import { EventManager } from '../models/Event';
 import EventCard from '../components/EventCard';
 
-const DashboardPage = ({ onAskAura }) => {
+const DashboardPage = () => {
     const { user } = useAuth();
+    const { onAskAura } = useOutletContext();
     const [eventManager] = useState(() => new EventManager());
     const [upcomingEvents, setUpcomingEvents] = useState([]);
     const [pastEvents, setPastEvents] = useState([]);
     const [showPastEvents, setShowPastEvents] = useState(false);
 
-    // Load events on mount and when eventManager changes
+    // Load events on mount
     useEffect(() => {
         loadEvents();
     }, []);
@@ -34,7 +36,7 @@ const DashboardPage = ({ onAskAura }) => {
     };
 
     return (
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full overflow-y-auto">
             {/* Header Section */}
             <div className="flex justify-between items-center mb-6">
                 <div>
@@ -92,7 +94,7 @@ const DashboardPage = ({ onAskAura }) => {
             </div>
 
             {/* Past Events Section */}
-            <div className="mb-6">
+            <div className="mb-8">
                 <button
                     onClick={() => setShowPastEvents(!showPastEvents)}
                     className="flex justify-between items-center w-full mb-4 hover:bg-white/5 p-2 rounded-lg transition-colors"
