@@ -67,7 +67,9 @@ const EventCard = ({ event, onEdit, onDelete }) => {
             {/* Location */}
             <div className="flex items-center gap-2 mb-3">
                 <MapPin className="w-4 h-4 text-pink-400" />
-                <span className="text-sm text-gray-300 truncate">{event.location.name}</span>
+                <span className="text-sm text-gray-300 truncate">
+                    {typeof event.location === 'string' ? event.location : event.location?.name || 'Unknown location'}
+                </span>
             </div>
 
             {/* Weather Info (if available) */}
@@ -76,7 +78,7 @@ const EventCard = ({ event, onEdit, onDelete }) => {
                     <div className="flex items-center gap-2">
                         <CloudSun className="w-4 h-4 text-yellow-400" />
                         <span className="text-xs text-gray-400">
-                            {event.weather.temperature}°C, {event.weather.condition}
+                            {event.weather.temperature}°C • Wind {event.weather.windSpeed} km/h • Rain {event.weather.chanceOfRain}%
                         </span>
                     </div>
                 </div>

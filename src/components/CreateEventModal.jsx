@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { X, Calendar, MapPin, Search, Cloud, Thermometer, Wind, Droplets, Sun, Gauge, Sparkles, LoaderCircle, Navigation } from 'lucide-react';
 import ReactDOM from 'react-dom';
 import LocationMap from './LocationMap';
-import GeocodingService from '../services/geocodingService';
+import { searchLocations, findNearestLocation } from '../data/predefinedLocations';
 
 class EventFormData {
     constructor() {
@@ -65,6 +65,8 @@ class WeatherService {
 }
 
 const CreateEventModal = ({ isOpen, onClose, onCreateEvent }) => {
+    console.log('CreateEventModal rendered, isOpen:', isOpen);
+    
     const [formData] = useState(new EventFormData());
     const [eventName, setEventName] = useState('');
     const [eventDate, setEventDate] = useState(new Date().toISOString().split('T')[0]);
@@ -82,8 +84,12 @@ const CreateEventModal = ({ isOpen, onClose, onCreateEvent }) => {
         if (!searchQuery.trim()) return;
         setIsSearching(true);
         try {
-            const results = await GeocodingService.searchLocation(searchQuery);
+            // Use predefined locations search (local, instant)
+            const results = searchLocations(searchQuery);
             setSearchResults(results);
+            if (results.length === 0) {
+                alert('No matching cities found. Please try: New York, Los Angeles, Chicago, etc.');
+            }
         } catch (error) {
             console.error('Search error:', error);
             alert('Failed to search location. Please try again.');
@@ -93,43 +99,30 @@ const CreateEventModal = ({ isOpen, onClose, onCreateEvent }) => {
     };
 
     const handleSelectSearchResult = (result) => {
-        setSelectedLocation(result.displayName);
+        const displayName = `${result.city}, ${result.state} (${result.region})`;
+        setSelectedLocation(displayName);
         setMapPosition([result.lat, result.lng]);
         setCoordinates({ lat: result.lat, lng: result.lng });
         setSearchResults([]);
-        setSearchQuery(result.name);
-        formData.setLocation(result.lat, result.lng, result.displayName);
+        setSearchQuery(result.city);
+        formData.setLocation(result.lat, result.lng, displayName);
     };
 
     const handleMapClick = async (lat, lng) => {
-        setCoordinates({ lat, lng });
-        setMapPosition([lat, lng]);
-        try {
-            const locationData = await GeocodingService.reverseGeocode(lat, lng);
-            setSelectedLocation(locationData.displayName);
-            setSearchQuery(locationData.name);
-            formData.setLocation(lat, lng, locationData.displayName);
-        } catch (error) {
-            console.error('Reverse geocoding error:', error);
-            setSelectedLocation(`${lat.toFixed(4)}, ${lng.toFixed(4)}`);
+        // Find nearest predefined location
+        const nearestLocation = findNearestLocation(lat, lng);
+        if (nearestLocation) {
+            const displayName = `${nearestLocation.city}, ${nearestLocation.state} (${nearestLocation.region})`;
+            setCoordinates({ lat: nearestLocation.lat, lng: nearestLocation.lng });
+            setMapPosition([nearestLocation.lat, nearestLocation.lng]);
+            setSelectedLocation(displayName);
+            setSearchQuery(nearestLocation.city);
+            formData.setLocation(nearestLocation.lat, nearestLocation.lng, displayName);
         }
     };
 
     const handleUseCurrentLocation = async () => {
-        setIsSearching(true);
-        try {
-            const location = await GeocodingService.getCurrentLocation();
-            setSelectedLocation(location.displayName);
-            setMapPosition([location.lat, location.lng]);
-            setCoordinates({ lat: location.lat, lng: location.lng });
-            setSearchQuery(location.name);
-            formData.setLocation(location.lat, location.lng, location.displayName);
-        } catch (error) {
-            console.error('Current location error:', error);
-            alert('Unable to get your current location. Please enable location permissions.');
-        } finally {
-            setIsSearching(false);
-        }
+        alert('Current location feature uses predefined cities. Please search for your nearest major US city.');
     };
 
     const handleFetchWeather = async () => {
@@ -151,17 +144,30 @@ const CreateEventModal = ({ isOpen, onClose, onCreateEvent }) => {
     };
 
     const handleSubmit = () => {
+        console.log('🔵 handleSubmit called');
+        console.log('Event Name:', eventName);
+        console.log('Selected Location:', selectedLocation);
+        console.log('Event Date:', eventDate);
+        
         formData.setEventName(eventName).setEventDate(eventDate);
+        
+        console.log('FormData isValid:', formData.isValid());
+        console.log('FormData location:', formData.location);
+        
         if (!formData.isValid()) {
             alert('Please fill in all required fields');
             return;
         }
-        onCreateEvent({
+        
+        const eventToCreate = {
             name: eventName,
             date: new Date(eventDate),
             location: selectedLocation,
             weather: weatherData
-        });
+        };
+        
+        console.log('✅ Creating event:', eventToCreate);
+        onCreateEvent(eventToCreate);
         handleClose();
     };
 
@@ -230,6 +236,14 @@ const CreateEventModal = ({ isOpen, onClose, onCreateEvent }) => {
                             {/* Location Search */}
                             <div>
                                 <label className="block text-sm font-medium mb-2">Location *</label>
+                                
+                                {/* Info Box */}
+                                <div className="mb-2 p-2 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                                    <p className="text-xs text-blue-300">
+                                        📍 Choose from 24 major US cities. Search by city name or click on the map.
+                                    </p>
+                                </div>
+
                                 <div className="flex gap-2">
                                     <div className="flex-1 relative">
                                         <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -238,7 +252,7 @@ const CreateEventModal = ({ isOpen, onClose, onCreateEvent }) => {
                                             value={searchQuery}
                                             onChange={(e) => setSearchQuery(e.target.value)}
                                             onKeyPress={(e) => e.key === 'Enter' && handleLocationSearch()}
-                                            placeholder="Search for a location..."
+                                            placeholder="Search: New York, Chicago, Los Angeles..."
                                             className="w-full bg-white/10 p-3 pl-12 rounded-lg focus:outline-none focus:ring-2 focus:ring-white/50 placeholder-gray-400"
                                         />
                                     </div>
@@ -251,9 +265,8 @@ const CreateEventModal = ({ isOpen, onClose, onCreateEvent }) => {
                                     </button>
                                     <button
                                         onClick={handleUseCurrentLocation}
-                                        disabled={isSearching}
-                                        className="glass-panel-light px-4 py-3 rounded-lg hover:bg-white/20 transition-colors disabled:opacity-50"
-                                        title="Use my current location"
+                                        className="glass-panel-light px-4 py-3 rounded-lg hover:bg-white/20 transition-colors"
+                                        title="Use predefined cities only"
                                     >
                                         <Navigation className="w-5 h-5" />
                                     </button>
@@ -271,8 +284,8 @@ const CreateEventModal = ({ isOpen, onClose, onCreateEvent }) => {
                                                 <div className="flex items-start gap-2">
                                                     <MapPin className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" />
                                                     <div className="flex-1 min-w-0">
-                                                        <p className="font-medium truncate">{result.name}</p>
-                                                        <p className="text-xs text-gray-400 truncate">{result.displayName}</p>
+                                                        <p className="font-medium truncate">{result.city}, {result.state}</p>
+                                                        <p className="text-xs text-gray-400 truncate">{result.region} • {result.timezone}</p>
                                                     </div>
                                                 </div>
                                             </button>

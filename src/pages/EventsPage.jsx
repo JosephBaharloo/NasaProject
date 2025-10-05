@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Sparkles, LoaderCircle } from 'lucide-react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
@@ -6,17 +6,31 @@ import '../react-calendar.css';
 import { callGeminiAPI } from '../services/geminiApi';
 import { weatherData } from '../data/weatherData.jsx';
 import CreateEventModal from '../components/CreateEventModal';
+import { EventManager } from '../models/Event';
 
 const EventsPage = () => {
     const [ideas, setIdeas] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [date, setDate] = useState(new Date(2025, 9, 4));
-    const [events, setEvents] = useState([
-        { date: new Date(2025, 9, 11), title: 'Hiking Trip' },
-        { date: new Date(2025, 9, 26), title: "Anna's Wedding" },
-        { date: new Date(2025, 10, 7), title: 'Camping' },
-    ]);
+    const [eventManager] = useState(() => new EventManager());
+    const [events, setEvents] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+    // Load events from EventManager on mount
+    useEffect(() => {
+        loadEvents();
+    }, []);
+
+    const loadEvents = () => {
+        const allEvents = [...eventManager.getUpcomingEvents(), ...eventManager.getPastEvents()];
+        // Convert Event objects to calendar format
+        const calendarEvents = allEvents.map(event => ({
+            date: event.date instanceof Date ? event.date : new Date(event.date),
+            title: event.name
+        }));
+        setEvents(calendarEvents);
+        console.log('📅 Calendar events loaded:', calendarEvents);
+    };
 
     const handleGetIdeas = async () => {
         setIsLoading(true);
@@ -32,22 +46,32 @@ const EventsPage = () => {
         setIsLoading(false);
     };
 
-    const handleCreateEvent = (newEvent) => {
-        setEvents([...events, newEvent]);
-        console.log('New event created:', newEvent);
+    const handleCreateEvent = (eventData) => {
+        // EventManager ile event oluştur ve localStorage'a kaydet
+        eventManager.addEvent(
+            eventData.name,
+            eventData.date,
+            eventData.location,
+            eventData.weather
+        );
+        // Event listesini güncelle
+        loadEvents();
+        console.log('✅ Event created and saved to localStorage:', eventData);
     };
 
     const tileContent = ({ date, view }) => {
         if (view === 'month') {
-            const event = events.find(event =>
-                event.date.getDate() === date.getDate() &&
-                event.date.getMonth() === date.getMonth() &&
-                event.date.getFullYear() === date.getFullYear()
-            );
+            const event = events.find(event => {
+                // Convert event.date to Date object if it's a string
+                const eventDate = event.date instanceof Date ? event.date : new Date(event.date);
+                
+                return eventDate.getDate() === date.getDate() &&
+                    eventDate.getMonth() === date.getMonth() &&
+                    eventDate.getFullYear() === date.getFullYear();
+            });
             if (event) {
                 return (
                     <>
-                        <div className="event-marker"></div>
                         <p className="event-title">{event.title}</p>
                     </>
                 );

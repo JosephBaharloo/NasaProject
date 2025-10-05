@@ -171,9 +171,22 @@ export class EventManager {
 
     /**
      * Add new event
-     * @param {Event} event
+     * @param {string} name - Event name
+     * @param {Date|string} date - Event date
+     * @param {string|Object} location - Location name or object
+     * @param {Object} weather - Weather data
+     * @returns {Event} Created event
      */
-    addEvent(event) {
+    addEvent(name, date, location, weather = null) {
+        // Generate unique ID
+        const id = `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        
+        // Ensure date is Date object
+        const eventDate = date instanceof Date ? date : new Date(date);
+        
+        // Create new Event instance
+        const event = new Event(id, name, eventDate, location, weather);
+        
         this.events.push(event);
         this.saveToStorage();
         return event;
