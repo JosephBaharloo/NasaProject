@@ -57,6 +57,7 @@
 
 .react-calendar__month-view__days__day {
     color: white;
+    
 }
 
 .react-calendar__tile {
@@ -122,4 +123,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     max-width: 100%;
+    background-color: #ef4444;
+    width: 100%;
+    border-radius: 8px;
 }
