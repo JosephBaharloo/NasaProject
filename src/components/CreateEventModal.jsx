@@ -43,7 +43,7 @@ class WeatherService {
         await new Promise(resolve => setTimeout(resolve, 1500));
         
         return {
-            temperature: Math.floor(Math.random() * 15) + 15,
+            temperature: Math.floor(Math.random() * 27) + 59, // 59-86°F (15-30°C)
             windSpeed: Math.floor(Math.random() * 20) + 5,
             chanceOfRain: Math.floor(Math.random() * 100),
             uvIndex: Math.floor(Math.random() * 11),
@@ -64,8 +64,8 @@ class WeatherService {
     }
 }
 
-const CreateEventModal = ({ isOpen, onClose, onCreateEvent }) => {
-    console.log('CreateEventModal rendered, isOpen:', isOpen);
+const CreateEventModal = ({ isOpen, onClose, onCreateEvent, editingEvent = null }) => {
+    console.log('CreateEventModal rendered, isOpen:', isOpen, 'editingEvent:', editingEvent);
     
     const [formData] = useState(new EventFormData());
     const [eventName, setEventName] = useState('');
@@ -79,6 +79,30 @@ const CreateEventModal = ({ isOpen, onClose, onCreateEvent }) => {
     const [weatherData, setWeatherData] = useState(null);
     const [isLoadingWeather, setIsLoadingWeather] = useState(false);
     const [aiRecommendation, setAiRecommendation] = useState('');
+
+    // Load editing event data when modal opens
+    React.useEffect(() => {
+        if (isOpen && editingEvent) {
+            // Populate form with editing event data
+            setEventName(editingEvent.name);
+            
+            // Convert date to input format
+            const eventDate = editingEvent.date instanceof Date 
+                ? editingEvent.date 
+                : new Date(editingEvent.date);
+            setEventDate(eventDate.toISOString().split('T')[0]);
+            
+            setSelectedLocation(editingEvent.location);
+            
+            // Set weather data if available
+            if (editingEvent.weather) {
+                setWeatherData(editingEvent.weather);
+                setAiRecommendation(editingEvent.weather.recommendation || '');
+            }
+            
+            console.log('📝 Loaded editing event data:', editingEvent);
+        }
+    }, [isOpen, editingEvent]);
 
     const handleLocationSearch = async () => {
         if (!searchQuery.trim()) return;
@@ -193,7 +217,7 @@ const CreateEventModal = ({ isOpen, onClose, onCreateEvent }) => {
                 <div className="glass-panel-light rounded-t-3xl p-6 flex justify-between items-center border-b border-white/10 flex-shrink-0">
                     <h2 className="text-2xl font-bold flex items-center gap-2">
                         <Calendar className="w-6 h-6" />
-                        Create New Event
+                        {editingEvent ? 'Edit Event' : 'Create New Event'}
                     </h2>
                     <button onClick={handleClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
                         <X className="w-6 h-6" />
@@ -344,7 +368,7 @@ const CreateEventModal = ({ isOpen, onClose, onCreateEvent }) => {
                                                 <Thermometer className="w-4 h-4 text-red-400" />
                                                 <span className="text-xs text-gray-300">Temperature</span>
                                             </div>
-                                            <p className="text-2xl font-bold">{weatherData.temperature}°C</p>
+                                            <p className="text-2xl font-bold">{weatherData.temperature}°F</p>
                                         </div>
                                         
                                         <div className="bg-white/10 rounded-lg p-3">
@@ -416,7 +440,7 @@ const CreateEventModal = ({ isOpen, onClose, onCreateEvent }) => {
                             disabled={!eventName || !selectedLocation}
                             className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-3 rounded-lg font-bold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            Create Event
+                            {editingEvent ? 'Update Event' : 'Create Event'}
                         </button>
                     </div>
                 </div>

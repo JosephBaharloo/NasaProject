@@ -14,6 +14,7 @@ const DashboardPage = () => {
     const [pastEvents, setPastEvents] = useState([]);
     const [showPastEvents, setShowPastEvents] = useState(false);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [editingEvent, setEditingEvent] = useState(null);
 
     // Debug log
     console.log('DashboardPage rendered, isCreateModalOpen:', isCreateModalOpen);
@@ -31,27 +32,44 @@ const DashboardPage = () => {
     const handleCreateEvent = (eventData) => {
         console.log('🟢 DashboardPage handleCreateEvent called with:', eventData);
         
-        // EventManager ile event oluştur ve localStorage'a kaydet
-        const newEvent = eventManager.addEvent(
-            eventData.name,
-            eventData.date,
-            eventData.location,
-            eventData.weather
-        );
-        
-        console.log('🟢 Event created by EventManager:', newEvent);
+        if (editingEvent) {
+            // Update existing event
+            eventManager.updateEvent(editingEvent.id, {
+                name: eventData.name,
+                date: eventData.date,
+                location: eventData.location,
+                weather: eventData.weather
+            });
+            console.log('✏️ Event updated:', editingEvent.id);
+            setEditingEvent(null);
+        } else {
+            // Create new event
+            const newEvent = eventManager.addEvent(
+                eventData.name,
+                eventData.date,
+                eventData.location,
+                eventData.weather
+            );
+            console.log('🟢 Event created by EventManager:', newEvent);
+        }
         
         // Event listesini güncelle
         loadEvents();
         
-        console.log('✅ Event created and saved to localStorage:', eventData);
+        console.log('✅ Event saved to localStorage:', eventData);
         console.log('📋 Updated upcoming events:', eventManager.getUpcomingEvents());
         console.log('📋 Updated past events:', eventManager.getPastEvents());
     };
 
     const handleEditEvent = (event) => {
-        // TODO: Open edit modal
-        console.log('Edit event:', event);
+        console.log('✏️ Edit event clicked:', event);
+        setEditingEvent(event);
+        setIsCreateModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsCreateModalOpen(false);
+        setEditingEvent(null);
     };
 
     const handleDeleteEvent = (eventId) => {
@@ -162,8 +180,9 @@ const DashboardPage = () => {
             {/* Create Event Modal */}
             <CreateEventModal 
                 isOpen={isCreateModalOpen}
-                onClose={() => setIsCreateModalOpen(false)}
+                onClose={handleCloseModal}
                 onCreateEvent={handleCreateEvent}
+                editingEvent={editingEvent}
             />
         </div>
     );

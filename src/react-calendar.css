@@ -73,6 +73,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
+    font-size: 1.1rem; /* Increased from default */
+    font-weight: 500;
 }
 
 .react-calendar__tile:disabled {
@@ -116,9 +118,11 @@
 }
 
 .event-title {
-    font-size: 0.7rem;
-    color: #d1d5db; /* Lighter gray for text */
-    margin-top: 2px;
+    font-size: 0.85rem; /* Increased from 0.7rem */
+    font-weight: 500;
+    color: #ffffff; /* White text for better contrast */
+    margin-top: 4px;
+    padding: 2px 4px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

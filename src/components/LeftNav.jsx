@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
-import { CloudHail, LayoutDashboard, CalendarDays, Settings, LogOut } from 'lucide-react';
+import { CloudHail, LayoutDashboard, CalendarDays, Info, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import ReactDOM from 'react-dom';
-import logoImage from '../assets/icons/nasaSpaceChallenge.png';
 
 const LeftNav = () => {
     const { user, logout } = useAuth();
@@ -54,7 +53,7 @@ const LeftNav = () => {
         <nav className="glass-panel rounded-3xl flex flex-col items-center justify-between py-6 px-2 w-20">
             <div className="flex flex-col items-center gap-6">
                 <div className="w-10 h-10 flex items-center justify-center">
-                    <img src={logoImage} alt="Logo" className="w-8 h-8" />
+                    <CloudHail className="w-24 h-24 mb-4" />
                 </div>
                 <ul className="flex flex-col gap-4">
                     <li>
@@ -78,8 +77,9 @@ const LeftNav = () => {
                         <NavLink 
                             to="/dashboard/settings"
                             className={({ isActive }) => `nav-item p-3 rounded-xl block ${isActive ? 'active' : ''}`}
+                            title="About"
                         >
-                            <Settings />
+                            <Info />
                         </NavLink>
                     </li>
                 </ul>

@@ -78,7 +78,7 @@ const EventCard = ({ event, onEdit, onDelete }) => {
                     <div className="flex items-center gap-2">
                         <CloudSun className="w-4 h-4 text-yellow-400" />
                         <span className="text-xs text-gray-400">
-                            {event.weather.temperature}°C • Wind {event.weather.windSpeed} km/h • Rain {event.weather.chanceOfRain}%
+                            {event.weather.temperature}°F • Wind {event.weather.windSpeed} mph • Rain {event.weather.chanceOfRain}%
                         </span>
                     </div>
                 </div>

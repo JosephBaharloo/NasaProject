@@ -29,8 +29,8 @@ export default function App() {
       " " +
       (current.subtitle || "") +
       "' with a temperature of " +
-      (current.temp != null ? current.temp : "") +
-      "°C. " +
+      (current.temp != null ? Math.round(current.temp * 9/5 + 32) : "") +
+      "°F. " +
       (current.desc || "")
     : "Today is " +
       selectedDay +
@@ -50,7 +50,7 @@ export default function App() {
             }}
           />
         </main>
-        <RightSidebar location={location} />
+        <RightSidebar />
       </div>
 
       <AuraModal
