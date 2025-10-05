@@ -12,9 +12,11 @@ const LoginPage = () => {
   const handleLogin = (e) => {
     e.preventDefault();
     const isEmail = identifier.includes('@');
+    // Email ile giriş yapıldıysa username olarak email'in @ öncesi kısmını al
+    // Username ile giriş yapıldıysa email olarak kullanıcının girdiği değeri kullan
     const mockUser = {
-      username: isEmail ? 'testuser' : identifier,
-      email: isEmail ? identifier : `${identifier}@example.com`,
+      username: isEmail ? identifier.split('@')[0] : identifier,
+      email: isEmail ? identifier : identifier,  // Her iki durumda da girilen değeri kullan
     };
     login(mockUser);
     navigate('/dashboard');

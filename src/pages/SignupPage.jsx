@@ -1,13 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { CloudHail } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const SignupPage = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const handleSignup = (e) => {
     e.preventDefault();
-    // Add signup logic here
+    // Signup işlemi sonrası kullanıcıyı login et
+    const newUser = {
+      username: username,
+      email: email,
+    };
+    login(newUser);
     navigate('/dashboard');
   };
 
@@ -31,6 +41,8 @@ const SignupPage = () => {
                 type="text"
                 id="username"
                 placeholder="yourusername"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 required
               />
             </div>
@@ -43,6 +55,8 @@ const SignupPage = () => {
                 type="email"
                 id="email"
                 placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
@@ -55,6 +69,8 @@ const SignupPage = () => {
                 type="password"
                 id="password"
                 placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </div>
